@@ -43,4 +43,16 @@ export class TaskService {
     }
   }
 
+  async updateTask(updatedTask: Task) {
+    const tasks = await this.getTasks();
+
+    const index = tasks.findIndex(task => task.id === updatedTask.id);
+
+    if (index !== -1) {
+      tasks[index] = updatedTask;
+
+      await this.storageService.set(this.STORAGE_KEY, tasks);
+    }
+  }
+
 }

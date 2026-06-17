@@ -7,47 +7,118 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+  <ion-button expand="block" routerLink="/categories">
+    Administrar categorias
+  </ion-button>
 
   <ion-item>
-    <ion-input
-      label="Nueva tarea"
-      [(ngModel)]="newTaskTitle">
+    <ion-input label="Nueva tarea" [(ngModel)]="newTaskTitle">
     </ion-input>
+  </ion-item>
 
-    <ion-button slot="end" (click)="addTask()">
-      Agregar
-    </ion-button>
+  <ion-item>
+    <ion-select
+      label="Categoria"
+      placeholder="Selecciona una categoria"
+      interface="popover"
+      [(ngModel)]="selectedCategoryId">
+      <ion-select-option value="">
+        Sin categoria
+      </ion-select-option>
+
+      <ion-select-option *ngFor="let category of categories" [value]="category.id">
+        {{category.name}}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-button expand="block" (click)="addTask()">
+    Agregar
+  </ion-button>
+
+  <ion-item>
+    <ion-select
+      label="Filtrar"
+      interface="popover"
+      [(ngModel)]="selectedFilterCategoryId"
+      (ionChange)="onFilterChange()">
+      <ion-select-option value="">
+        Todas
+      </ion-select-option>
+
+      <ion-select-option *ngFor="let category of categories" [value]="category.id">
+        {{category.name}}
+      </ion-select-option>
+    </ion-select>
   </ion-item>
 
   <ion-list>
-
-    <ion-item *ngFor="let task of tasks">
-
-      <ion-checkbox
-        slot="start"
-        [checked]="task.completed"
-        (ionChange)="toggleCompleted(task.id)">
+    <ion-item *ngFor="let task of filteredTasks">
+      <ion-checkbox slot="start" [checked]="task.completed" (ionChange)="toggleCompleted(task.id)">
       </ion-checkbox>
 
       <ion-label>
-
         <h2 [style.text-decoration]="task.completed ? 'line-through' : 'none'">
           {{task.title}}
         </h2>
-
+        <p>Categoria: {{ getCategoryName(task.categoryId) }}</p>
       </ion-label>
 
-      <ion-button
-        color="danger"
-        fill="clear"
-        (click)="deleteTask(task.id)">
-
-        Eliminar
-
+      <ion-button fill="clear" (click)="openEditTaskModal(task)">
+        Editar
       </ion-button>
 
+      <ion-button color="danger" fill="clear" (click)="deleteTask(task.id)">
+        Eliminar
+      </ion-button>
     </ion-item>
-
   </ion-list>
 
+  <ion-modal [isOpen]="isEditTaskModalOpen" (didDismiss)="closeEditTaskModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>
+            Editar tarea
+          </ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeEditTaskModal()">
+              Cerrar
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="ion-padding">
+        <ion-item>
+          <ion-input
+            label="Titulo"
+            [(ngModel)]="editingTaskTitle">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-select
+            label="Categoria"
+            interface="popover"
+            [(ngModel)]="editingTaskCategoryId">
+            <ion-select-option value="">
+              Sin categoria
+            </ion-select-option>
+
+            <ion-select-option *ngFor="let category of categories" [value]="category.id">
+              {{category.name}}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-button
+          expand="block"
+          [disabled]="!editingTaskTitle.trim()"
+          (click)="saveTask()">
+          Guardar
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
