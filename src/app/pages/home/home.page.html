@@ -7,7 +7,7 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-button expand="block" routerLink="/categories">
+  <ion-button *ngIf="enableCategories" expand="block" routerLink="/categories">
     Administrar categorias
   </ion-button>
 
@@ -16,7 +16,7 @@
     </ion-input>
   </ion-item>
 
-  <ion-item>
+  <ion-item *ngIf="enableCategories">
     <ion-select
       label="Categoria"
       placeholder="Selecciona una categoria"
@@ -36,7 +36,7 @@
     Agregar
   </ion-button>
 
-  <ion-item>
+  <ion-item *ngIf="enableCategories">
     <ion-select
       label="Filtrar"
       interface="popover"
@@ -61,7 +61,7 @@
         <h2 [style.text-decoration]="task.completed ? 'line-through' : 'none'">
           {{task.title}}
         </h2>
-        <p>Categoria: {{ getCategoryName(task.categoryId) }}</p>
+        <p *ngIf="enableCategories">Categoria: {{ getCategoryName(task.categoryId) }}</p>
       </ion-label>
 
       <ion-button fill="clear" (click)="openEditTaskModal(task)">
@@ -97,7 +97,7 @@
           </ion-input>
         </ion-item>
 
-        <ion-item>
+        <ion-item *ngIf="enableCategories">
           <ion-select
             label="Categoria"
             interface="popover"

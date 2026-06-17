@@ -3,6 +3,7 @@ import { Task } from '../../models/task.model';
 import { TaskService } from '../../services/task.service';
 import { Category } from '../../models/category.model';
 import { CategoryService } from '../../services/category.service';
+import { RemoteConfigService } from '../../services/remote-config.service';
 
 @Component({
   selector: 'app-home',
@@ -17,14 +18,27 @@ export class HomePage implements OnInit {
   selectedCategoryId = '';
   filteredTasks: Task[] = [];
   selectedFilterCategoryId = '';
+  enableCategories = true;
   isEditTaskModalOpen = false;
   editingTask: Task | null = null;
   editingTaskTitle = '';
   editingTaskCategoryId = '';
 
-  constructor(private taskService: TaskService, private categoryService: CategoryService) {}
+  constructor(
+    private taskService: TaskService,
+    private categoryService: CategoryService,
+    private remoteConfigService: RemoteConfigService
+  ) {}
 
   async ngOnInit() {
+    this.enableCategories = await this.remoteConfigService.isCategoriesEnabled();
+
+    if (!this.enableCategories) {
+      this.selectedCategoryId = '';
+      this.selectedFilterCategoryId = '';
+      this.editingTaskCategoryId = '';
+    }
+
     await this.loadCategories();
     await this.loadTasks();
   }
@@ -35,6 +49,11 @@ export class HomePage implements OnInit {
   }
 
   async loadCategories() {
+    if (!this.enableCategories) {
+      this.categories = [];
+      return;
+    }
+
     this.categories = await this.categoryService.getCategories();
   }
 
@@ -44,7 +63,7 @@ export class HomePage implements OnInit {
   }
 
   applyFilter() {
-    if (!this.selectedFilterCategoryId) {
+    if (!this.enableCategories || !this.selectedFilterCategoryId) {
       this.filteredTasks = this.tasks;
       return;
     }
@@ -65,7 +84,7 @@ export class HomePage implements OnInit {
       id: Date.now().toString(),
       title: this.newTaskTitle.trim(),
       completed: false,
-      categoryId: this.selectedCategoryId || undefined
+      categoryId: this.enableCategories ? this.selectedCategoryId || undefined : undefined
     };
 
     await this.taskService.addTask(task);
@@ -91,7 +110,7 @@ export class HomePage implements OnInit {
   openEditTaskModal(task: Task) {
     this.editingTask = task;
     this.editingTaskTitle = task.title;
-    this.editingTaskCategoryId = task.categoryId || '';
+    this.editingTaskCategoryId = this.enableCategories ? task.categoryId || '' : '';
     this.isEditTaskModalOpen = true;
   }
 
@@ -108,7 +127,7 @@ export class HomePage implements OnInit {
     const updatedTask: Task = {
       ...this.editingTask,
       title: this.editingTaskTitle.trim(),
-      categoryId: this.editingTaskCategoryId || undefined
+      categoryId: this.enableCategories ? this.editingTaskCategoryId || undefined : undefined
     };
 
     await this.taskService.updateTask(updatedTask);
