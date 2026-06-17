@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { Category } from 'src/app/models/category.model';
 import { CategoryService } from 'src/app/services/category.service';
 
@@ -7,9 +7,10 @@ import { CategoryService } from 'src/app/services/category.service';
   templateUrl: './categories.page.html',
   styleUrls: ['./categories.page.scss'],
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoriesPage implements OnInit {
-  categories: Category[] = [];
+  readonly categories$ = this.categoryService.categories$;
   newCategoryName = '';
   isEditModalOpen = false;
   editingCategory: Category | null = null;
@@ -18,36 +19,25 @@ export class CategoriesPage implements OnInit {
   constructor(private categoryService: CategoryService) {}
 
   async ngOnInit() {
-    await this.loadCategories();
-  }
-
-  async ionViewWillEnter() {
-    await this.loadCategories();
-  }
-
-  async loadCategories() {
-    this.categories = await this.categoryService.getCategories();
+    await this.categoryService.initialize();
   }
 
   async addCategory() {
-    if (!this.newCategoryName.trim()) return;
+    if (!this.newCategoryName.trim()) {
+      return;
+    }
 
     const category: Category = {
       id: Date.now().toString(),
-      name: this.newCategoryName,
+      name: this.newCategoryName.trim(),
     };
 
     await this.categoryService.addCategory(category);
-
     this.newCategoryName = '';
-
-    await this.loadCategories();
   }
 
   async deleteCategory(id: string) {
     await this.categoryService.deleteCategory(id);
-
-    await this.loadCategories();
   }
 
   openEditModal(category: Category) {
@@ -63,7 +53,9 @@ export class CategoriesPage implements OnInit {
   }
 
   async saveCategory() {
-    if (!this.editingCategory || !this.editingCategoryName.trim()) return;
+    if (!this.editingCategory || !this.editingCategoryName.trim()) {
+      return;
+    }
 
     const updatedCategory: Category = {
       ...this.editingCategory,
@@ -71,8 +63,10 @@ export class CategoriesPage implements OnInit {
     };
 
     await this.categoryService.updateCategory(updatedCategory);
-
     this.closeEditModal();
-    await this.loadCategories();
+  }
+
+  trackByCategory(index: number, category: Category) {
+    return category.id;
   }
 }

@@ -17,7 +17,7 @@
   </ion-item>
 
   <ion-list>
-    <ion-item *ngFor="let category of categories">
+    <ion-item *ngFor="let category of categories$ | async; trackBy: trackByCategory">
       <ion-label>
         {{category.name}}
       </ion-label>

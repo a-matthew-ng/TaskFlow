@@ -18,7 +18,7 @@ export class RemoteConfigService {
     const app = initializeApp(environment.firebase);
 
     this.remoteConfig = getRemoteConfig(app);
-    this.remoteConfig.settings.minimumFetchIntervalMillis = 0;
+    this.remoteConfig.settings.minimumFetchIntervalMillis = 3600000; // 1 hour
     this.remoteConfig.defaultConfig = {
       enable_categories: true
     };

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { Task } from '../models/task.model';
 import { StorageService } from './storage.service';
 
@@ -6,53 +7,72 @@ import { StorageService } from './storage.service';
   providedIn: 'root'
 })
 export class TaskService {
-
-  private STORAGE_KEY = 'tasks';
+  private readonly STORAGE_KEY = 'tasks';
+  private readonly tasksSubject = new BehaviorSubject<Task[]>([]);
+  tasks$ = this.tasksSubject.asObservable();
+  private initialized = false;
+  private initializePromise?: Promise<void>;
 
   constructor(private storageService: StorageService) {}
 
-  async getTasks(): Promise<Task[]> {
-    return (await this.storageService.get(this.STORAGE_KEY)) || [];
+  async initialize(): Promise<void> {
+    if (this.initialized) {
+      return;
+    }
+
+    const tasks = (await this.storageService.get(this.STORAGE_KEY)) || [];
+    this.tasksSubject.next(tasks);
+    this.initialized = true;
   }
 
-  async addTask(task: Task) {
-    const tasks = await this.getTasks();
+  private async ensureInitialized(): Promise<void> {
+    if (this.initialized) {
+      return;
+    }
 
-    tasks.push(task);
+    this.initializePromise = this.initializePromise ?? this.initialize();
+    await this.initializePromise;
+  }
 
+  private get currentTasks(): Task[] {
+    return this.tasksSubject.value;
+  }
+
+  private async persistTasks(tasks: Task[]): Promise<void> {
     await this.storageService.set(this.STORAGE_KEY, tasks);
+    this.tasksSubject.next(tasks);
   }
 
-  async deleteTask(id: string) {
-    const tasks = await this.getTasks();
-
-    const updatedTasks = tasks.filter(task => task.id !== id);
-
-    await this.storageService.set(this.STORAGE_KEY, updatedTasks);
+  async getTasks(): Promise<Task[]> {
+    await this.ensureInitialized();
+    return this.currentTasks;
   }
 
-  async toggleCompleted(id: string) {
-    const tasks = await this.getTasks();
-
-    const task = tasks.find(task => task.id === id);
-
-    if (task) {
-      task.completed = !task.completed;
-
-      await this.storageService.set(this.STORAGE_KEY, tasks);
-    }
+  async addTask(task: Task): Promise<void> {
+    await this.ensureInitialized();
+    await this.persistTasks([...this.currentTasks, task]);
   }
 
-  async updateTask(updatedTask: Task) {
-    const tasks = await this.getTasks();
-
-    const index = tasks.findIndex(task => task.id === updatedTask.id);
-
-    if (index !== -1) {
-      tasks[index] = updatedTask;
-
-      await this.storageService.set(this.STORAGE_KEY, tasks);
-    }
+  async deleteTask(id: string): Promise<void> {
+    await this.ensureInitialized();
+    await this.persistTasks(this.currentTasks.filter(task => task.id !== id));
   }
 
+  async toggleCompleted(id: string): Promise<void> {
+    await this.ensureInitialized();
+    await this.persistTasks(
+      this.currentTasks.map(task =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  }
+
+  async updateTask(updatedTask: Task): Promise<void> {
+    await this.ensureInitialized();
+    await this.persistTasks(
+      this.currentTasks.map(task =>
+        task.id === updatedTask.id ? updatedTask : task
+      )
+    );
+  }
 }
