@@ -1,27 +1,176 @@
-#container {
-  text-align: center;
+/* Home page modern, Todoist/Things3 inspired styles */
 
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+:root {
+  --card-radius: 12px;
+  --card-shadow: 0 6px 18px rgba(16,24,40,0.06);
+  --muted: #6b7280;
+  --secondary: #7c3aed; /* accent for categories */
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+.home-content {
+  --ion-safe-area-top: 16px;
+  padding: 16px;
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
+.header-toolbar {
+  --background: transparent;
+  padding: 8px 16px;
+}
 
-  color: #8c8c8c;
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
 
+.titles {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-title {
   margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
 }
 
-#container a {
-  text-decoration: none;
+.subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.categories-btn ion-icon {
+  font-size: 20px;
+  color: var(--ion-color-primary);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.card {
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  overflow: visible;
+}
+
+.new-task-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.rounded-input {
+  flex: 1 1 320px;
+  --background: #fff;
+  border-radius: 999px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.04);
+}
+
+.rounded-input ion-input {
+  padding: 12px 16px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.category-select {
+  min-width: 160px;
+}
+
+.add-btn ion-icon {
+  font-size: 18px;
+}
+
+.filter-card {
+  padding: 0 8px;
+}
+
+.tasks-section {
+  margin-top: 4px;
+}
+
+.task-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.task-card {
+  border-radius: 12px;
+  --background: #fff;
+  box-shadow: var(--card-shadow);
+  padding: 8px 12px;
+}
+
+.task-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.task-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.task-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.task-title.completed {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+
+.task-meta .category {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.task-actions ion-button {
+  --padding-start: 6px;
+  --padding-end: 6px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+  color: var(--muted);
+}
+
+.empty-icon {
+  font-size: 48px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+@media (min-width: 700px) {
+  .layout {
+    grid-template-columns: 1fr 360px;
+    align-items: start;
+  }
+
+  .new-task-card, .filter-card {
+    margin-bottom: 0;
+  }
 }

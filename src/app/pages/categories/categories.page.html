@@ -1,67 +1,82 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>
-      Categorias
-    </ion-title>
+  <ion-toolbar class="header-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <div class="header-content">
+      <div class="titles">
+        <h1 class="app-title">Categorias</h1>
+        <p class="subtitle">Organiza tus etiquetas</p>
+      </div>
+    </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-item>
-    <ion-input label="Nueva categoria" [(ngModel)]="newCategoryName">
-    </ion-input>
+<ion-content class="categories-content" fullscreen>
+  <div class="layout">
+    <ion-card class="card new-task-card">
+      <ion-card-header>
+        <ion-card-title>Nueva categoria</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="new-category-row">
+          <ion-item class="rounded-input">
+            <ion-input placeholder="Nombre de la categoria" [(ngModel)]="newCategoryName"></ion-input>
+          </ion-item>
 
-    <ion-button slot="end" (click)="addCategory()">
-      Agregar
-    </ion-button>
-  </ion-item>
+          <ion-button color="primary" fill="solid" (click)="addCategory()" class="add-btn">
+            <ion-icon slot="start" name="add-circle-outline"></ion-icon>
+            Agregar
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
 
-  <ion-list>
-    <ion-item *ngFor="let category of categories$ | async; trackBy: trackByCategory">
-      <ion-label>
-        {{category.name}}
-      </ion-label>
+    <section class="category-list">
+      <ng-container *ngIf="(categories$ | async) as categories">
+        <div *ngIf="categories.length > 0; else emptyState">
+          <div *ngFor="let category of categories; trackBy: trackByCategory" class="category-card">
+            <div class="category-name">{{category.name}}</div>
+            <div class="category-actions">
+              <ion-button fill="clear" size="small" (click)="openEditModal(category)">
+                <ion-icon name="pencil-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" color="danger" size="small" (click)="deleteCategory(category.id)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
 
-      <ion-button fill="clear" (click)="openEditModal(category)">
-        Editar
-      </ion-button>
+      <ng-template #emptyState>
+        <div class="empty-state">
+          <ion-icon name="clipboard-outline" class="empty-icon"></ion-icon>
+          <h3>No hay categorias todavía</h3>
+          <p class="muted">Agrega una categoria para comenzar.</p>
+        </div>
+      </ng-template>
+    </section>
 
-      <ion-button fill="clear" color="danger" (click)="deleteCategory(category.id)">
-        Eliminar
-      </ion-button>
-    </ion-item>
-  </ion-list>
+    <ion-modal [isOpen]="isEditModalOpen" (didDismiss)="closeEditModal()">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-title>Editar categoria</ion-title>
+            <ion-buttons slot="end">
+              <ion-button (click)="closeEditModal()">Cerrar</ion-button>
+            </ion-buttons>
+          </ion-toolbar>
+        </ion-header>
 
-  <ion-modal [isOpen]="isEditModalOpen" (didDismiss)="closeEditModal()">
-    <ng-template>
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>
-            Editar categoria
-          </ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="closeEditModal()">
-              Cerrar
-            </ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
+        <ion-content class="ion-padding">
+          <ion-item>
+            <ion-input label="Nombre" [(ngModel)]="editingCategoryName" (ionInput)="editingCategoryName = ($event.detail?.value ?? '')"></ion-input>
+          </ion-item>
 
-      <ion-content class="ion-padding">
-        <ion-item>
-          <ion-input
-            label="Nombre"
-            [(ngModel)]="editingCategoryName">
-          </ion-input>
-        </ion-item>
-
-        <ion-button
-          expand="block"
-          [disabled]="!editingCategoryName.trim()"
-          (click)="saveCategory()">
-          Guardar
-        </ion-button>
-      </ion-content>
-    </ng-template>
-  </ion-modal>
+          <ion-button expand="block" [disabled]="!editingCategoryName.trim()" (click)="saveCategory()">Guardar</ion-button>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+  </div>
 </ion-content>

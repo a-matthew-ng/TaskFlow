@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Category } from 'src/app/models/category.model';
 import { CategoryService } from 'src/app/services/category.service';
 
@@ -16,7 +16,7 @@ export class CategoriesPage implements OnInit {
   editingCategory: Category | null = null;
   editingCategoryName = '';
 
-  constructor(private categoryService: CategoryService) {}
+  constructor(private categoryService: CategoryService, private cd: ChangeDetectorRef) {}
 
   async ngOnInit() {
     await this.categoryService.initialize();
@@ -44,12 +44,14 @@ export class CategoriesPage implements OnInit {
     this.editingCategory = category;
     this.editingCategoryName = category.name;
     this.isEditModalOpen = true;
+    this.cd.markForCheck();
   }
 
   closeEditModal() {
     this.isEditModalOpen = false;
     this.editingCategory = null;
     this.editingCategoryName = '';
+    this.cd.markForCheck();
   }
 
   async saveCategory() {
