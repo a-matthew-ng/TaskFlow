@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>
+      TaskFlow
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-item>
+    <ion-input
+      label="Nueva tarea"
+      [(ngModel)]="newTaskTitle">
+    </ion-input>
+
+    <ion-button slot="end" (click)="addTask()">
+      Agregar
+    </ion-button>
+  </ion-item>
+
+  <ion-list>
+
+    <ion-item *ngFor="let task of tasks">
+
+      <ion-checkbox
+        slot="start"
+        [checked]="task.completed"
+        (ionChange)="toggleCompleted(task.id)">
+      </ion-checkbox>
+
+      <ion-label>
+
+        <h2 [style.text-decoration]="task.completed ? 'line-through' : 'none'">
+          {{task.title}}
+        </h2>
+
+      </ion-label>
+
+      <ion-button
+        color="danger"
+        fill="clear"
+        (click)="deleteTask(task.id)">
+
+        Eliminar
+
+      </ion-button>
+
+    </ion-item>
+
+  </ion-list>
+
+</ion-content>
