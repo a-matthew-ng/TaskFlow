@@ -1,5 +1,7 @@
 {
   "name": "TaskFlow",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

@@ -40,3 +40,6 @@
 html, body, ion-app {
 	background-color: #f5f7fb; /* soft light background */
 }
+ion-content::part(scroll) {
+  padding-top: env(safe-area-inset-top);
+}
