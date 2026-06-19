@@ -164,6 +164,10 @@
   color: var(--muted);
 }
 
+.rounded-input ion-input{
+  color: black;
+}
+
 @media (min-width: 700px) {
   .layout {
     grid-template-columns: 1fr 360px;
